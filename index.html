@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>My first three.js app</title>
+    <style>
+      body {
+        margin: 0;
+      }
+
+      canvas {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script src="js/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+
+    <script>
+      var renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+
+      var controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+      var geometry = new THREE.BoxGeometry(1, 1, 1);
+      var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      var cube = new THREE.Mesh(geometry, material);
+      scene.add(cube);
+
+      camera.position.set(0, 20, 100);
+
+      var mercuryCurve = new THREE.EllipseCurve(
+        0,
+        0, // ax, aY
+        2,
+        2, // xRadius, yRadius
+        0,
+        2 * Math.PI, // aStartAngle, aEndAngle
+        false, // aClockwise
+        0 // aRotation
+      );
+
+      var mercuryCurvePoints = mercuryCurve.getPoints(50);
+      var mercuryCurveGeometry = new THREE.BufferGeometry().setFromPoints(
+        mercuryCurvePoints
+      );
+
+      var orbitMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+
+      // Create the final object to add to the scene
+      var mercuryEllipse = new THREE.Line(mercuryCurveGeometry, orbitMaterial);
+
+      scene.add(mercuryEllipse);
+      function animate() {
+        controls.update();
+        requestAnimationFrame(animate);
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.01;
+        renderer.render(scene, camera);
+      }
+      animate();
+    </script>
+  </body>
+</html>
