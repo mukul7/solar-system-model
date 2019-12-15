@@ -16,8 +16,15 @@
   </head>
 
   <body>
+    <script>
+      var SCREEN_WIDTH = window.innerWidth;
+      var SCREEN_HEIGHT = window.innerHeight;
+      var aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+    </script>
     <script src="js/three.js"></script>
     <script src="js/controls/OrbitControls.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/objects.js"></script>
 
     <script>
       var renderer = new THREE.WebGLRenderer();
@@ -26,48 +33,43 @@
 
       var scene = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera(
-        75,
+        1000,
         window.innerWidth / window.innerHeight,
         0.1,
-        1000
+        100000000
       );
+      camera.position.set(0, 0, getRadii("mercury", "perihilon") + 10);
 
       var controls = new THREE.OrbitControls(camera, renderer.domElement);
+      var sun = getSphere(getRadii("sun", "surface") * 10);
 
-      var geometry = new THREE.BoxGeometry(1, 1, 1);
-      var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-      var cube = new THREE.Mesh(geometry, material);
-      scene.add(cube);
+      scene.add(sun);
 
-      camera.position.set(0, 20, 100);
+      scene.add(getOrbit("mercury", 0xff0000));
+      scene.add(getOrbit("venus2", 0x00ff00));
 
-      var mercuryCurve = new THREE.EllipseCurve(
-        0,
-        0, // ax, aY
-        2,
-        2, // xRadius, yRadius
-        0,
-        2 * Math.PI, // aStartAngle, aEndAngle
-        false, // aClockwise
-        0 // aRotation
-      );
+      ////////////
+      // var bulbGeometry = new THREE.SphereBufferGeometry(RADII.sun, 16, 8);
+      // bulbLight = new THREE.PointLight(0xffffff, 10000, 100, 2);
+      // bulbMat = new THREE.MeshStandardMaterial({
+      //   emissive: 0xffffff,
+      //   emissiveIntensity: 10000,
+      //   color: 0xffffff
+      // });
+      // bulbLight.add(new THREE.Mesh(bulbGeometry, bulbMat));
+      // bulbLight.position.set(0, 2, 0);
+      // bulbLight.castShadow = true;
+      // scene.add(bulbLight);
+      /////////////
 
-      var mercuryCurvePoints = mercuryCurve.getPoints(50);
-      var mercuryCurveGeometry = new THREE.BufferGeometry().setFromPoints(
-        mercuryCurvePoints
-      );
+      var dirLight = new THREE.DirectionalLight(0xff0000, 10000000000000);
+      dirLight.position.set(0, 0, 0).normalize();
+      dirLight.color.setHSL(0.1, 0.7, 0.5);
+      scene.add(dirLight);
 
-      var orbitMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
-
-      // Create the final object to add to the scene
-      var mercuryEllipse = new THREE.Line(mercuryCurveGeometry, orbitMaterial);
-
-      scene.add(mercuryEllipse);
       function animate() {
         controls.update();
         requestAnimationFrame(animate);
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.01;
         renderer.render(scene, camera);
       }
       animate();
