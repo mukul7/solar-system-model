@@ -1,8 +1,8 @@
-const MULTIPLY_FACTOR = 2000;
+const MULTIPLY_FACTOR = 1;
 
-const RADII2 = {
+const RADII = {
   sun: {
-    surface: 695510
+    surface: 6955100
   },
   mercury: {
     surface: 2439.7,
@@ -15,7 +15,7 @@ const RADII2 = {
     surface: 6051.8,
     semiMajorAxis: 108208000,
     aphelion: 108939000,
-    perihilon: 1074770008,
+    perihilon: 107477000,
     eccentricity: 0.0067
   },
   venus2: {
@@ -31,34 +31,37 @@ const RADII2 = {
     aphelion: 152100000,
     perihilon: 147095000
   },
-  mars: 3389.5 / MULTIPLY_FACTOR,
-  jupiter: 69911 / MULTIPLY_FACTOR,
-  saturn: 58232 / MULTIPLY_FACTOR,
-  uranus: 25362 / MULTIPLY_FACTOR,
-  neptune: 24622 / MULTIPLY_FACTOR,
+  mars: 3389.5,
+  jupiter: 69911,
+  saturn: 58232,
+  uranus: 25362,
+  neptune: 24622,
   aphelion: {
-    mars: 249200000 / MULTIPLY_FACTOR,
-    jupiter: 816620000 / MULTIPLY_FACTOR,
-    saturn: 151450000000 / MULTIPLY_FACTOR,
-    uranus: 3008413200 / MULTIPLY_FACTOR,
-    neptune: 4537303400 / MULTIPLY_FACTOR
+    mars: 249200000,
+    jupiter: 816620000,
+    saturn: 151450000000,
+    uranus: 3008413200,
+    neptune: 4537303400
   },
   perihilon: {
-    mars: 206700000 / MULTIPLY_FACTOR,
-    jupiter: 740520000 / MULTIPLY_FACTOR,
-    saturn: 135255000000 / MULTIPLY_FACTOR,
-    uranus: 2742129000 / MULTIPLY_FACTOR,
-    neptune: 4459512500 / MULTIPLY_FACTOR
+    mars: 206700000,
+    jupiter: 740520000,
+    saturn: 135255000000,
+    uranus: 2742129000,
+    neptune: 4459512500
   }
 };
+
+console.log("mj", RADII["venus"]["semiMajorAxis"]);
+
 function getRadii(planet, property) {
-  return RADII2[planet][property] / MULTIPLY_FACTOR;
+  return RADII[planet][property] / MULTIPLY_FACTOR;
 }
 function getSemiMinorAxis(planet) {
   return (
-    (RADII2[planet]["semiMajorAxis"] *
+    (RADII[planet]["semiMajorAxis"] *
       Math.sqrt(
-        1 - RADII2[planet]["eccentricity"] * RADII2[planet]["eccentricity"]
+        1 - RADII[planet]["eccentricity"] * RADII[planet]["eccentricity"]
       )) /
     MULTIPLY_FACTOR
   );
@@ -66,7 +69,7 @@ function getSemiMinorAxis(planet) {
 
 function getOrbitalCenterX(planet) {
   let x =
-    (RADII2[planet]["semiMajorAxis"] - RADII2[planet]["perihilon"]) /
+    (RADII[planet]["semiMajorAxis"] - RADII[planet]["perihilon"]) /
     MULTIPLY_FACTOR;
   return x;
 }

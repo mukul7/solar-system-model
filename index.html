@@ -32,21 +32,29 @@
       document.body.appendChild(renderer.domElement);
 
       var scene = new THREE.Scene();
-      var camera = new THREE.PerspectiveCamera(
-        1000,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        100000000
+      // var camera = new THREE.PerspectiveCamera(
+      //   1000,
+      //   window.innerWidth / window.innerHeight,
+      //   0.1,
+      //   100000000000000000000
+      // );
+      var camera = new THREE.OrthographicCamera(
+        window.innerWidth / -2,
+        window.innerWidth / 2,
+        window.innerHeight / 2,
+        window.innerHeight / -2,
+        100,
+        100000000000000000000
       );
       camera.position.set(0, 0, getRadii("mercury", "perihilon") + 10);
 
       var controls = new THREE.OrbitControls(camera, renderer.domElement);
-      var sun = getSphere(getRadii("sun", "surface") * 10);
+      var sun = getSphere(getRadii("sun", "surface"));
 
       scene.add(sun);
 
       scene.add(getOrbit("mercury", 0xff0000));
-      scene.add(getOrbit("venus2", 0x00ff00));
+      scene.add(getOrbit("venus", 0x00ff00));
 
       ////////////
       // var bulbGeometry = new THREE.SphereBufferGeometry(RADII.sun, 16, 8);

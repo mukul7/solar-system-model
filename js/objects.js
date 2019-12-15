@@ -35,6 +35,10 @@ function getOrbit(planet, color) {
     linewidth: 5000000
   });
 
+  console.log(planet);
+  console.log("xRadius", getRadii(planet, "semiMajorAxis"));
+  console.log("yRadius", getSemiMinorAxis(planet));
+
   // Create the final object to add to the scene
   var planetOrbit = new THREE.Line(ellipseGeometry, orbitMaterial);
   return planetOrbit;
