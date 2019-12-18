@@ -25,6 +25,7 @@
     <script src="js/controls/OrbitControls.js"></script>
     <script src="js/constants.js"></script>
     <script src="js/objects.js"></script>
+    <script src="js/loaders/GLTFLoader.js"></script>
 
     <script>
       var renderer = new THREE.WebGLRenderer();
@@ -32,52 +33,230 @@
       document.body.appendChild(renderer.domElement);
 
       var scene = new THREE.Scene();
-      // var camera = new THREE.PerspectiveCamera(
-      //   1000,
-      //   window.innerWidth / window.innerHeight,
-      //   0.1,
+      // scene.background = new THREE.Color(0xffffff);
+      var camera = new THREE.PerspectiveCamera(
+        1000,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000000000000000000000000
+      );
+      // var camera = new THREE.OrthographicCamera(
+      //   window.innerWidth / -2,
+      //   window.innerWidth / 2,
+      //   window.innerHeight / 2,
+      //   window.innerHeight / -2,
+      //   100,
       //   100000000000000000000
       // );
-      var camera = new THREE.OrthographicCamera(
-        window.innerWidth / -2,
-        window.innerWidth / 2,
-        window.innerHeight / 2,
-        window.innerHeight / -2,
-        100,
-        100000000000000000000
-      );
-      camera.position.set(0, 0, getRadii("mercury", "perihilon") + 10);
+      camera.position.set(0, 0, -100000000);
 
       var controls = new THREE.OrbitControls(camera, renderer.domElement);
-      var sun = getSphere(getRadii("sun", "surface"));
 
-      scene.add(sun);
+      // scene.add(sun);
+      var loader = new THREE.GLTFLoader();
 
-      scene.add(getOrbit("mercury", 0xff0000));
-      scene.add(getOrbit("venus", 0x00ff00));
+      // loadModels();
 
-      ////////////
-      // var bulbGeometry = new THREE.SphereBufferGeometry(RADII.sun, 16, 8);
-      // bulbLight = new THREE.PointLight(0xffffff, 10000, 100, 2);
-      // bulbMat = new THREE.MeshStandardMaterial({
-      //   emissive: 0xffffff,
-      //   emissiveIntensity: 10000,
-      //   color: 0xffffff
-      // });
-      // bulbLight.add(new THREE.Mesh(bulbGeometry, bulbMat));
-      // bulbLight.position.set(0, 2, 0);
-      // bulbLight.castShadow = true;
-      // scene.add(bulbLight);
-      /////////////
+      let planets = [
+        {
+          name: "sun",
+          sceneObjects: {
+            planet: null
+          },
+          positionAngle: 0
+        },
+        {
+          name: "mercury",
+          sceneObjects: {
+            planet: null,
+            orbit: getOrbit("mercury", 0xff0000)
+          },
+          positionAngle: 0
+        },
+        {
+          name: "venus",
+          sceneObjects: {
+            planet: null,
+            orbit: getOrbit("venus", 0x00ff00)
+          },
+          positionAngle: 0
+        },
+        {
+          name: "earth",
+          sceneObjects: {
+            planet: null,
+            orbit: getOrbit("earth", 0x00ff00)
+          },
+          positionAngle: 0
+        },
+        {
+          name: "mars",
+          sceneObjects: {
+            planet: null,
+            orbit: getOrbit("mars", 0x00ff00)
+          },
+          positionAngle: 0
+        },
+        {
+          name: "jupiter",
+          sceneObjects: {
+            planet: null,
+            orbit: getOrbit("jupiter", 0x00ff00)
+          },
+          positionAngle: 0
+        },
+        {
+          name: "saturn",
+          sceneObjects: {
+            planet: null,
+            orbit: getOrbit("saturn", 0x00ff00)
+          },
+          positionAngle: 0
+        },
+        {
+          name: "uranus",
+          sceneObjects: {
+            planet: null,
+            orbit: getOrbit("uranus", 0x00ff00)
+          },
+          positionAngle: 0
+        },
+        {
+          name: "neptune",
+          sceneObjects: {
+            planet: null,
+            orbit: getOrbit("neptune", 0x00ff00)
+          },
+          positionAngle: 0
+        }
+      ];
 
-      var dirLight = new THREE.DirectionalLight(0xff0000, 10000000000000);
-      dirLight.position.set(0, 0, 0).normalize();
-      dirLight.color.setHSL(0.1, 0.7, 0.5);
-      scene.add(dirLight);
+      window.objects = [];
+
+      planets.forEach(planet => {
+        if (planet.sceneObjects["orbit"])
+          scene.add(planet.sceneObjects["orbit"]);
+
+        getPlanet(planet.name).then(planetObject => {
+          planet.sceneObjects["planet"] = planetObject;
+          getPlanetLabel(planet.name).then(labelObject => {
+            planet.sceneObjects["label"] = labelObject;
+            console.log("planet", planetObject);
+            console.log("label", labelObject);
+
+            scene.add(planetObject);
+            materials = [
+              new THREE.MeshPhongMaterial({
+                color: 0xffffff,
+                flatShading: true
+              }), // front
+              new THREE.MeshPhongMaterial({ color: 0xffffff }) // side
+            ];
+
+            textGeo = new THREE.BufferGeometry().fromGeometry(labelObject);
+            textMesh1 = new THREE.Mesh(textGeo, materials);
+
+            let group = new THREE.Group();
+            group.add(textMesh1);
+            group.add(planetObject);
+
+            scene.add(group);
+          });
+        });
+      });
+
+      var light = new THREE.PointLight(0xffffff, 1, 0);
+      light.position.set(0, 0, 0);
+      scene.add(light);
+
+      //Stars adding
+
+      // var bgStars = [];
+      // for (var i = 0; i < 500; i++) {
+      //   var tw = {
+      //     x: Math.random(),
+      //     y: Math.random()
+      //   };
+      //   bgStars.push(tw);
+      // }
+
+      // var light2 = new THREE.PointLight(0xffffff, 1, 0);
+      // light2.position.set(0, 0, -10000000);
+      // scene.add(light2);
+
+      // var loader = new THREE.GLTFLoader();
+      // loader.load(
+      //   "/3d-models/" + RADII["sun"].modelFile,
+      //   function(gltf) {
+      //     window.gltf = gltf;
+      //     gltf.scene.children[0].geometry.scale(50000, 50000, 50000);
+      //     gltf.scene.children[0].position.set(
+      //       getRadii("sun", "aphelion"),
+      //       0,
+      //       0
+      //     );
+      //     console.log("sun", " load ho gya");
+      //     scene.add(gltf.scene.children[0]);
+      //   },
+      //   function(xhr) {
+      //     console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+      //   },
+      //   // called when loading has errors
+      //   function(error) {
+      //     console.log(name, " ki fat gyi ");
+      //   }
+      // );
 
       function animate() {
         controls.update();
+        planets.forEach(planet => {
+          for (objectType in planet.sceneObjects) {
+            if (
+              planet.sceneObjects[objectType] &&
+              (objectType == "planet" || objectType == "label") &&
+              planet.name != "sun"
+            ) {
+              planet.positionAngle +=
+                (2 * Math.PI) / getRadii(planet.name, "revolutionPeriod");
+              let positionX =
+                getRadii(planet.name, "semiMajorAxis") *
+                  Math.cos(planet.positionAngle) +
+                getOrbitalCenterX(planet.name);
+              let positionY =
+                getSemiMinorAxis(planet.name) * Math.sin(planet.positionAngle);
+
+              planet.sceneObjects["planet"].position.set(
+                positionX,
+                positionY,
+                0
+              );
+
+              // for (var s in bgStars) {
+              //   var q = bgStars[s],
+              //     oX = q.x * ctx.canvas.width,
+              //     oY = q.y * ctx.canvas.height,
+              //     size =
+              //       Math.random() < 0.9998 ? Math.random() : Math.random() * 3;
+              //   ctx.beginPath();
+              //   ctx.moveTo(oX, oY - size);
+              //   ctx.lineTo(oX + size, oY);
+              //   ctx.lineTo(oX, oY + size);
+              //   ctx.lineTo(oX - size, oY);
+              //   ctx.closePath();
+              //   ctx.fill();
+              // }
+              // planet.sceneObjects["label"].position.set(
+              //   positionX,
+              //   positionY,
+              //   0
+              // );
+            }
+          }
+        });
+        window.scene = scene;
         requestAnimationFrame(animate);
+        renderer.gammaOutput = true;
+        renderer.gammaFactor = 2.2;
         renderer.render(scene, camera);
       }
       animate();
